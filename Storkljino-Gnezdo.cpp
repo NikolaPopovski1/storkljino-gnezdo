@@ -6,21 +6,26 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <chrono>
 
 // constant file name
-const std::string FILENAME = "testni_primer0.txt";
+const std::string FILENAME_INPUT = "testni_primer2.txt";
+const std::string FILENAME_OUTPUT = "testni_primer1_moje_r.txt";
 
 int main() {
-    std::ifstream file(FILENAME);
+    std::ifstream file_in(FILENAME_INPUT);
+    std::ofstream file_out(FILENAME_OUTPUT);
 
-    if (!file.is_open()) {
-        std::cerr << "Failed to open " << FILENAME << "\n";
+    if (!file_in.is_open()) {
+        std::cerr << "Failed to open " << FILENAME_INPUT << "\n";
         return 1;
     }
 
     std::string line;
-    std::getline(file, line);
+    std::getline(file_in, line);
     if (line.empty()) return 1;
+
+    auto start = std::chrono::high_resolution_clock::now();
 
     std::istringstream iss(line);
     int n, v, s;
@@ -36,7 +41,7 @@ int main() {
     }
 
     for (int i = 0; i < n; i++) {
-        std::getline(file, line);
+        std::getline(file_in, line);
         std::istringstream iss(line);
 
         char c;
@@ -97,10 +102,22 @@ int main() {
             smallest = std::max(smallest, min_in_set);  // Update smallest if needed
         }
 
-        std::cout << i << ": " << smallest << std::endl;
+        //std::cout << smallest << std::endl;
+		if (i == n - 1) {
+			file_out << smallest;
+		}
+		else {
+			file_out << smallest << std::endl;
+		}
     }
 
+	file_in.close();
+	file_out.close();
 
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Elapsed time: " << duration.count() << " seconds" << std::endl;
 
     return 0;
 }
