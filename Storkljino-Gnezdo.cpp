@@ -8,7 +8,7 @@
 #include <algorithm>
 
 // constant file name
-const std::string FILENAME = "testni_primer1.txt";
+const std::string FILENAME = "testni_primer0.txt";
 
 int main() {
     std::ifstream file(FILENAME);
@@ -26,12 +26,12 @@ int main() {
     int n, v, s;
     iss >> n >> v >> s;
 
-    std::vector<std::tuple<int, int, int>> changes(n);
+    std::vector<std::tuple<int, int, int>> changes;
     std::vector<std::multiset<int>> msVec(s);
 
     // Initialize the multiset for every column (width columns)
     for (int i = 0; i < s; i++) {
-        std::multiset<int> ms = { 0 };
+        std::multiset<int> ms = {};
 		msVec[i] = ms;
     }
 
@@ -46,7 +46,8 @@ int main() {
             int y, x, d;
             iss >> y >> x >> d;
 
-            changes[i] = std::make_tuple(y, x, d);
+            auto t = std::make_tuple(y, x, d);
+            changes.push_back(t);
 
             for (int j = x; j < x + d; j++) {
                 msVec[j].insert(y);
@@ -73,7 +74,7 @@ int main() {
                 }
             //}
             
-			changes[idx - 1] = std::make_tuple(0, 0, 0);  // Mark as removed
+			// changes[idx - 1] = std::make_tuple(0, 0, 0);  // Mark as removed
 
 			// access first item from tuple of changes[j - 1]
             //std::get<0>(changes[idx - 1]) = 0;
@@ -83,16 +84,20 @@ int main() {
             return 1;
         }
 
-        int largest = std::numeric_limits<int>::min();  // Initialize to the smallest possible value
+        int smallest = std::numeric_limits<int>::min();  // Initialize to the largest possible value
 
         // Iterate through all the multisets in msVec
         for (int j = 0; j < s; j++) {
-            // Get the largest element (last element in the multiset)
-            int max_in_set = *msVec[j].rbegin();  // rbegin() gives reverse iterator (points to the largest element)
-            largest = std::max(largest, max_in_set);  // Update largest if needed
-            if (largest == 0) break;  // If largest is 0, we can stop checking
+            if (msVec[j].empty()) {
+                smallest = v;  // Set smallest to v if any multiset is empty
+                break;
+            }
+
+            int min_in_set = *msVec[j].begin();  // begin() gives the smallest element
+            smallest = std::max(smallest, min_in_set);  // Update smallest if needed
         }
-        std::cout << i << ": " << v - largest << std::endl;
+
+        std::cout << i << ": " << smallest << std::endl;
     }
 
 
